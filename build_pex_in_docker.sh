@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# TODO This file is still WIP
+# Goal: Build the pex file while mounting the repository into a container
+# matching the target platform
+# Issues:
+# - The editable file:/// resolve in the requirements.txt uses an absolute path
+
 set -euo pipefail
 
 # Check if the argument (local package path) is provided
@@ -24,10 +30,10 @@ fi
 # Generate the package specific requirements txt
 uv pip compile pyproject.toml --universal -o dist/requirements.txt --quiet
 
-# Build the pex
-# TODO https://zameermanji.com/blog/2021/6/25/packaging-multi-platform-python-applications/
+echo "Compiled requirements.txt"
 
-docker run --rm -v "$(pwd):/app" -w /app build-container \
+# Build the pex
+docker run --rm -v "$(pwd):/app" -w /build build-container \
 uv run pex \
 -r dist/requirements.txt \
 -o dist/bin.pex \

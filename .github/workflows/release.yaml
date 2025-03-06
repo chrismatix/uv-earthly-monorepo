@@ -9,6 +9,10 @@ jobs:
   release:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        arch: [ x86, arm ]
+
     steps:
       - uses: actions/checkout@v4
 
@@ -29,7 +33,7 @@ jobs:
         run: uv sync && uv tool install pex
 
       - name: Build pex files
-        run: make build-pex
+        run: make build-pex ARCH=${{ matrix.arch }}
 
       - name: Build and push images
-        run: EARTHLY_PUSH=true make build-images
+        run: EARTHLY_PUSH=true make build-images ARCH=${{ matrix.arch }}

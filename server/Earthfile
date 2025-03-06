@@ -7,4 +7,5 @@ build:
     ENTRYPOINT /app.bin
 
     SAVE IMAGE server
-    SAVE IMAGE --push chrismatic/uv-earthly-mono-example:server
+
+    SAVE IMAGE --push chrismatic/uv-earthly-mono-example:server_$TARGETARCH

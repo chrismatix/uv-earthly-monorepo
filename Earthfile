@@ -1,9 +1,12 @@
+VERSION 0.8
 
 build-container:
-    FROM python:3.10-slim-bookworm
-    COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+    # Run this in the docker file, because earthly does not support COPY --from
+    FROM DOCKERFILE -f Dockerfile.build .
 
-    COPY pyproject.toml uv.lock .
+    WORKDIR build
+    COPY pyproject.toml uv.lock /build
+    RUN uv tool install pex
     RUN uv sync
 
     SAVE IMAGE build-container

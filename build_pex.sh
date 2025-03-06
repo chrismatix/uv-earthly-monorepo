@@ -41,4 +41,4 @@ uv run pex \
 chmod +x dist/bin
 
 echo "artifacts in dist:"
-ls dist
+ls -l dist
