@@ -6,5 +6,7 @@ build:
 
     ENTRYPOINT /app.bin
 
-    SAVE IMAGE server
-    SAVE IMAGE --push chrismatic/uv-earthly-mono-example:cli
+    SAVE IMAGE cli
+
+    ARG TARGETARCH
+    SAVE IMAGE --push chrismatic/uv-earthly-mono-example:cli_$TARGETARCH
