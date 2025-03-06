@@ -1,0 +1,22 @@
+name: Push Images
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Build pex files
+        run: make build-pex
+
+      - name: Build and push images
+        run: make build-images
