@@ -8,5 +8,6 @@ build:
 
     SAVE IMAGE server
 
-    ARG ARCH=$NATIVEARCH
-    SAVE IMAGE --push chrismatic/uv-earthly-mono-example:server_$ARCH
+    # USERARCH ?
+    ARG TARGETARCH
+    SAVE IMAGE --push chrismatic/uv-earthly-mono-example:server_$TARGETARCH
