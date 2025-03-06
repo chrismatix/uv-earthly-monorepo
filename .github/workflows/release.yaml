@@ -11,7 +11,7 @@ jobs:
 
     strategy:
       matrix:
-        arch: [ x86, arm ]
+        os: [ubuntu-latest, ubuntu-24.04-arm]
 
     steps:
       - uses: actions/checkout@v4
@@ -32,8 +32,5 @@ jobs:
       - name: Install dependencies
         run: uv sync && uv tool install pex
 
-      - name: Build pex files
-        run: make build-pex ARCH=${{ matrix.arch }}
-
       - name: Build and push images
-        run: EARTHLY_PUSH=true make build-images ARCH=${{ matrix.arch }}
+        run: EARTHLY_PUSH=true make build-images
