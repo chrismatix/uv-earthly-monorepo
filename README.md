@@ -40,6 +40,13 @@ Here we do it with earthly, even though you could conceivably also have one `Doc
 
 The entire repositories build process can be run with `make build-images`
 
+## The example repository
+
+The repository consists of a library `lib/format` that is consumed by two different targets `server` and `cli`.
+
+To produce the `pex` for either target
+
+
 ## Limitations
 
 - To do cross platform builds you need to run the build script
