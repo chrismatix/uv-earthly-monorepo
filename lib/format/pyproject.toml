@@ -7,3 +7,7 @@ requires-python = ">=3.10"
 dependencies = [
     "emoji>=2.14.1",
 ]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
