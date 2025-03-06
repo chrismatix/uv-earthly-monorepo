@@ -8,6 +8,9 @@ if [ -z "$1" ]; then
   exit 1
 fi
 
+# Build the build-container
+earthly +build-container
+
 # Navigate to the specified package path
 PACKAGE_PATH="$1"
 
@@ -24,6 +27,7 @@ uv pip compile pyproject.toml --universal -o dist/requirements.txt --quiet
 # Build the pex
 # TODO https://zameermanji.com/blog/2021/6/25/packaging-multi-platform-python-applications/
 
+docker run --rm -v "$(pwd):/app" -w /app build-container \
 uv run pex \
 -r dist/requirements.txt \
 -o dist/bin.pex \
@@ -31,12 +35,6 @@ uv run pex \
 --python-shebang '#!/usr/bin/env python3' \
 --sources-dir=. \
 --scie eager
-# --platform manylinux2014_x86_64-cp-3.10.13-none \
-
-#--platform macosx_11_0_arm64-cp-3.10.13-cp3.10.13m
-
-#--platform manylinux2014_x86_64-cp-310-cp310-none \
-#--platform macosx_11_0_arm64-cp-310-cp310m \
 
 chmod +x dist/bin
 
