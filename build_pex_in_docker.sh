@@ -1,24 +1,35 @@
 #!/bin/bash
 
-# TODO This file is still WIP
-# Goal: Build the pex file while mounting the repository into a container
-# matching the target platform
-# Issues:
-# - The editable file:/// resolve in the requirements.txt uses an absolute path
-
 set -euo pipefail
 
-# Check if the argument (local package path) is provided
-if [ -z "$1" ]; then
-  echo "Usage: $0 <local_package_path>"
+# Store the repository root path (assuming this script is run from the repo root)
+REPO_ROOT=$(pwd)
+PACKAGE_PATH="$1"
+PLATFORM="${2:-}"
+
+# Check if the argument (local package path) is provided and if the path exists
+if [ -z "$PACKAGE_PATH" ] || [ ! -d "$PACKAGE_PATH" ]; then
+  echo "Usage: $0 <local_package_path> [platform]"
+  echo "Error: Path '$PACKAGE_PATH' does not exist or is not a directory."
   exit 1
 fi
 
-# Build the build-container
-earthly +build-container
+if [ -n "$PLATFORM" ]; then
+  echo "Building pex for $PACKAGE_PATH with docker using platform $PLATFORM"
+else
+  echo "Building pex for $PACKAGE_PATH with docker"
+fi
 
-# Navigate to the specified package path
-PACKAGE_PATH="$1"
+echo "Rebuilding the pex-builder..."
+# Build the pex-builder with optional platform argument
+if [ -n "$PLATFORM" ]; then
+  earthly --platform "$PLATFORM" +pex-builder
+else
+  earthly +pex-builder
+fi
+
+echo "Building the pex file for $1"
+
 
 if [ -d "$PACKAGE_PATH" ]; then
   cd "$PACKAGE_PATH" || { echo "Failed to cd into $PACKAGE_PATH"; exit 1; }
@@ -27,22 +38,47 @@ else
   exit 1
 fi
 
+
 # Generate the package specific requirements txt
 uv pip compile pyproject.toml --universal -o dist/requirements.txt --quiet
 
-echo "Compiled requirements.txt"
+# Replace the absolute host path with the container path
+# Works on both macOS and Linux
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS sed requires empty string after -i
+    sed -i '' "s|file://$REPO_ROOT|file:///build|g" dist/requirements.txt
+else
+    # Linux sed
+    sed -i "s|file://$REPO_ROOT|file:///build|g" dist/requirements.txt
+fi
 
-# Build the pex
-docker run --rm -v "$(pwd):/app" -w /build build-container \
-uv run pex \
--r dist/requirements.txt \
--o dist/bin.pex \
--e main \
---python-shebang '#!/usr/bin/env python3' \
---sources-dir=. \
---scie eager
+echo "Compiled $PACKAGE_PATH/dist/requirements.txt"
 
-chmod +x dist/bin
+# go back to the root to build the pex
+cd "$REPO_ROOT" || { echo "Failed to cd into $REPO_ROOT"; exit 1; }
 
-echo "artifacts in dist:"
-ls dist
+# Build the pex with optional platform argument
+if [ -n "$PLATFORM" ]; then
+  docker run --rm --platform "$PLATFORM" -v "$(pwd):/build" -w /build/"$PACKAGE_PATH" pex-builder \
+  pex \
+  -r dist/requirements.txt \
+  -o dist/bin.pex \
+  -e main \
+  --sources-dir=. \
+  --python-shebang '#!/usr/bin/env python3' \
+  --scie eager
+else
+  docker run --rm -v "$(pwd):/build" -w /build/"$PACKAGE_PATH" pex-builder \
+  pex \
+  -r dist/requirements.txt \
+  -o dist/bin.pex \
+  -e main \
+  --python-shebang '#!/usr/bin/env python3' \
+  --sources-dir=. \
+  --scie eager
+fi
+
+chmod +x "$PACKAGE_PATH"/dist/bin
+
+echo "output artifacts in $PACKAGE_PATH/dist:"
+ls "$PACKAGE_PATH"/dist
