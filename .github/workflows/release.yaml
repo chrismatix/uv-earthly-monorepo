@@ -33,7 +33,7 @@ jobs:
         run: uv sync && uv tool install pex
 
       - name: Run tests
-        run: uv run pytest
+        run: make test
 
       - name: Build and push images
         run: EARTHLY_PUSH=true make build-images
