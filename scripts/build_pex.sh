@@ -18,7 +18,7 @@ else
   exit 1
 fi
 
-echo "Building the pex file for $PACKAGE_PATHJK"
+echo "Building the pex file for $PACKAGE_PATH"
 
 # Generate the package specific requirements txt
 uv pip compile pyproject.toml --universal -o dist/requirements.txt --quiet
@@ -32,7 +32,8 @@ uv run pex \
 -e main \
 --python-shebang '#!/usr/bin/env python3' \
 --sources-dir=. \
---scie eager
+--scie eager \
+--scie-pbs-stripped
 
 chmod +x dist/bin
 

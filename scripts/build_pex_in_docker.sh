@@ -66,7 +66,8 @@ if [ -n "$PLATFORM" ]; then
   -e main \
   --sources-dir=. \
   --python-shebang '#!/usr/bin/env python3' \
-  --scie eager
+  --scie eager \
+  --scie-pbs-stripped
 else
   docker run --rm -v "$(pwd):/build" -w /build/"$PACKAGE_PATH" pex-builder \
   pex \
@@ -75,7 +76,8 @@ else
   -e main \
   --python-shebang '#!/usr/bin/env python3' \
   --sources-dir=. \
-  --scie eager
+  --scie eager \
+  --scie-pbs-stripped
 fi
 
 chmod +x "$PACKAGE_PATH"/dist/bin
