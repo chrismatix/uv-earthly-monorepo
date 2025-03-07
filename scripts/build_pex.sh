@@ -18,6 +18,8 @@ else
   exit 1
 fi
 
+echo "Building the pex file for $PACKAGE_PATHJK"
+
 # Generate the package specific requirements txt
 uv pip compile pyproject.toml --universal -o dist/requirements.txt --quiet
 
@@ -31,14 +33,8 @@ uv run pex \
 --python-shebang '#!/usr/bin/env python3' \
 --sources-dir=. \
 --scie eager
-# --platform manylinux2014_x86_64-cp-3.10.13-none \
-
-#--platform macosx_11_0_arm64-cp-3.10.13-cp3.10.13m
-
-#--platform manylinux2014_x86_64-cp-310-cp310-none \
-#--platform macosx_11_0_arm64-cp-310-cp310m \
 
 chmod +x dist/bin
 
-echo "artifacts in dist:"
-ls -l dist
+echo "output artifacts in $PACKAGE_PATH/dist:"
+ls -lh dist

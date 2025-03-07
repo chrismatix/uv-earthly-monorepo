@@ -32,5 +32,8 @@ jobs:
       - name: Install dependencies
         run: uv sync && uv tool install pex
 
+      - name: Run tests
+        run: uv run pytest
+
       - name: Build and push images
         run: EARTHLY_PUSH=true make build-images
