@@ -29,7 +29,8 @@ uv run pex \
 --python-shebang '#!/usr/bin/env python3' \
 --sources-dir=. \
 # (optional) Package a full python distribution with the executable 
---scie eager
+--scie eager \
+--scie-pbs-stripped
 ```
 
 The resulting pex file will also include a full python interpreter and is only portable given the same architecture
