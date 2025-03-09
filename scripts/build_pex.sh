@@ -26,7 +26,7 @@ uv pip compile pyproject.toml --universal -o dist/requirements.txt --quiet
 # Build the pex
 # TODO https://zameermanji.com/blog/2021/6/25/packaging-multi-platform-python-applications/
 
-uv run pex \
+uvx pex \
 -r dist/requirements.txt \
 -o dist/bin.pex \
 -e main \

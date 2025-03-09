@@ -60,7 +60,7 @@ cd "$REPO_ROOT" || { echo "Failed to cd into $REPO_ROOT"; exit 1; }
 # Build the pex with optional platform argument
 if [ -n "$PLATFORM" ]; then
   docker run --rm --platform "$PLATFORM" -v "$(pwd):/build" -w /build/"$PACKAGE_PATH" pex-builder \
-  pex \
+  uvx pex \
   -r dist/requirements.txt \
   -o dist/bin.pex \
   -e main \
@@ -70,7 +70,7 @@ if [ -n "$PLATFORM" ]; then
   --scie-pbs-stripped
 else
   docker run --rm -v "$(pwd):/build" -w /build/"$PACKAGE_PATH" pex-builder \
-  pex \
+  uvx pex \
   -r dist/requirements.txt \
   -o dist/bin.pex \
   -e main \
