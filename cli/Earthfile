@@ -4,7 +4,7 @@ FROM python:3.10-slim
 build:
     COPY ./dist/bin /app.bin
 
-    ENTRYPOINT /app.bin
+    ENTRYPOINT ["/app.bin"]
 
     SAVE IMAGE cli
 

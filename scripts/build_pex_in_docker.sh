@@ -20,16 +20,26 @@ else
   echo "Building pex for $PACKAGE_PATH with docker"
 fi
 
-echo "Rebuilding the pex-builder..."
-# Build the pex-builder with optional platform argument
-if [ -n "$PLATFORM" ]; then
-  earthly --platform "$PLATFORM" +pex-builder
+if [ "${REBUILD_PEX_BUILDER:-}" == "true" ]; then
+  echo "Rebuilding the pex-builder..."
+  # Build the pex-builder with optional platform argument
+  if [ -n "$PLATFORM" ]; then
+    earthly --platform "$PLATFORM" +pex-builder
+  else
+    earthly +pex-builder
+  fi
 else
-  earthly +pex-builder
+  echo "Skipping pex-builder rebuild as REBUILD_PEX_BUILDER is not set to 'true'."
 fi
 
-echo "Building the pex file for $1"
+DIST_DIR="$PACKAGE_PATH"/dist
 
+# If we don't clear the target bin pex will keep
+# adding to the old archive!
+rm -r "$DIST_DIR"
+echo "Cleared dist directory $DIST_DIR"
+
+echo "Building the pex file for $1"
 
 if [ -d "$PACKAGE_PATH" ]; then
   cd "$PACKAGE_PATH" || { echo "Failed to cd into $PACKAGE_PATH"; exit 1; }
@@ -52,14 +62,14 @@ else
     sed -i "s|file://$REPO_ROOT|file:///build|g" dist/requirements.txt
 fi
 
-echo "Compiled $PACKAGE_PATH/dist/requirements.txt"
+echo "Compiled $DIST_DIR/requirements.txt"
 
 # go back to the root to build the pex
 cd "$REPO_ROOT" || { echo "Failed to cd into $REPO_ROOT"; exit 1; }
 
 # Build the pex with optional platform argument
 if [ -n "$PLATFORM" ]; then
-  docker run --rm --platform "$PLATFORM" -v "$(pwd):/build" -w /build/"$PACKAGE_PATH" pex-builder \
+  docker run --rm -it --platform "$PLATFORM" -v "$(pwd):/build" -w /build/"$PACKAGE_PATH" pex-builder \
   uvx pex \
   -r dist/requirements.txt \
   -o dist/bin.pex \
@@ -69,7 +79,7 @@ if [ -n "$PLATFORM" ]; then
   --scie eager \
   --scie-pbs-stripped
 else
-  docker run --rm -v "$(pwd):/build" -w /build/"$PACKAGE_PATH" pex-builder \
+  docker run --rm -it -v "$(pwd):/build" -w /build/"$PACKAGE_PATH" pex-builder \
   uvx pex \
   -r dist/requirements.txt \
   -o dist/bin.pex \
@@ -80,7 +90,7 @@ else
   --scie-pbs-stripped
 fi
 
-chmod +x "$PACKAGE_PATH"/dist/bin
+chmod +x "$DIST_DIR"/bin
 
-echo "output artifacts in $PACKAGE_PATH/dist:"
-ls "$PACKAGE_PATH"/dist
+echo "output artifacts in $DIST_DIR:"
+ls -lh "$DIST_DIR"

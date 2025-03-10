@@ -18,13 +18,24 @@ else
   exit 1
 fi
 
+DIST_DIR="$PACKAGE_PATH"/dist
+
+# If we don't clear the target bin pex will keep
+# adding to the old archive!
+rm -r "$DIST_DIR"
+echo "Cleared dist directory $DIST_DIR"
+
+
 echo "Building the pex file for $PACKAGE_PATH"
 
 # Generate the package specific requirements txt
 uv pip compile pyproject.toml --universal -o dist/requirements.txt --quiet
 
 # Build the pex
-# TODO https://zameermanji.com/blog/2021/6/25/packaging-multi-platform-python-applications/
+# TODO figure out how to do cross platform builds without docker
+# At the moment this still leads to rather annoying issues with dependencies that
+# do not have a pre-built whl for the target platform
+# https://zameermanji.com/blog/2021/6/25/packaging-multi-platform-python-applications/
 
 uvx pex \
 -r dist/requirements.txt \
@@ -37,5 +48,5 @@ uvx pex \
 
 chmod +x dist/bin
 
-echo "output artifacts in $PACKAGE_PATH/dist:"
+echo "output artifacts in $DIST_DIR:"
 ls -lh dist
