@@ -1,6 +1,6 @@
 # Python mono-repo using UV, Pex, and Earthly
 
-![build](https://github.com/chrismatix/uv-pex-monorepo/actions/workflows/release.yml/badge.svg)
+![build](https://github.com/chrismatix/uv-pex-monorepo/actions/workflows/release.yaml/badge.svg)
 
 This repository contains an example of a monorepo setup using uv and pex for building python executables.
 The docker builds are handled with Earthly, but could be easily replaced with plain Dockerfiles.
