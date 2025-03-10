@@ -1,5 +1,6 @@
 VERSION 0.8
-FROM python:3.10-slim
+# No need for a python image as we bundle it in the binary
+FROM debian:bookworm-slim
 
 build:
     COPY ./dist/bin /app.bin
